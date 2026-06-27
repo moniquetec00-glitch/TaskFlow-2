@@ -36,6 +36,7 @@ const rotasTarefas  = require("./src/routes/tarefas");
 const rotasProjetos = require("./src/routes/projetos");
 const rotasUsuarios = require("./src/routes/usuarios");
 const rotasStats    = require("./src/routes/stats");
+const rotasAdmin    = require("./src/routes/admin");
 
 const PORT       = process.env.PORT || 3000;
 const PUBLIC_DIR = path.join(__dirname, "public");
@@ -51,6 +52,7 @@ async function main() {
     rotasProjetos.registrar(router);
     rotasUsuarios.registrar(router);
     rotasStats.registrar(router);
+    rotasAdmin.registrar(router);
 
     function pipeline(req, res) {
         const middlewares = [
@@ -98,3 +100,5 @@ main().catch(err => {
     console.error("[FATAL] Falha ao iniciar:", err.message, err.stack);
     process.exit(1);
 });
+
+rotasAdmin.registrar(router);

@@ -39,6 +39,7 @@ async function inicializar() {
                 email      VARCHAR(200) NOT NULL UNIQUE,
                 senha_hash VARCHAR(100) NOT NULL,
                 cargo      VARCHAR(80)  NOT NULL DEFAULT 'Membro',
+                role       ENUM('admin','membro') NOT NULL DEFAULT 'membro',
                 criado_em  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP
             )
         `);
@@ -284,6 +285,21 @@ const db = {
             concluidas: Number(concluidas),
             usuarios:   1   // workspace individual; expanda se implementar times
         };
+    },
+
+    async getUsuariosTodos() {
+        const [rows] = await pool.execute(
+            "SELECT id, nome, email, cargo, role, criado_em FROM usuarios ORDER BY criado_em DESC"
+        );
+        return rows;
+    },
+
+    async setRole(id, role) {
+        await pool.execute(
+            "UPDATE usuarios SET role = ? WHERE id = ?",
+            [role, id]
+        );
+        return true;
     }
 };
 

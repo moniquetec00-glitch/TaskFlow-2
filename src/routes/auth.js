@@ -12,7 +12,7 @@ const { autenticar, SECRET } = require("../middleware/auth");
 
 function gerarToken(usuario) {
     return jwt.sign(
-        { id: usuario.id, nome: usuario.nome, email: usuario.email },
+        { id: usuario.id, nome: usuario.nome, email: usuario.email, role: usuario.role },
         SECRET,
         { expiresIn: "7d" }
     );
