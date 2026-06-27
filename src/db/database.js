@@ -14,18 +14,20 @@
 const mysql = require("mysql2/promise");
 
 // ===== POOL DE CONEXÕES =====
-const pool = mysql.createPool({
-    host:               process.env.DB_HOST     || "localhost",
-    port:               parseInt(process.env.DB_PORT || "3306"),
-    user:               process.env.DB_USER     || "root",
-    password:           process.env.DB_PASSWORD || "",
-    database:           process.env.DB_NAME     || "taskflow",
-    waitForConnections: true,
-    connectionLimit:    10,
-    queueLimit:         0,
-    timezone:           "Z"
-});
-
+const pool = mysql.createPool(
+    process.env.MYSQL_URL ||
+    process.env.DATABASE_URL || {
+        host:               process.env.DB_HOST     || "localhost",
+        port:               parseInt(process.env.DB_PORT || "3306"),
+        user:               process.env.DB_USER     || "root",
+        password:           process.env.DB_PASSWORD || "",
+        database:           process.env.DB_NAME     || "taskflow",
+        waitForConnections: true,
+        connectionLimit:    10,
+        queueLimit:         0,
+        timezone:           "Z"
+    }
+);
 // ===== INICIALIZAÇÃO DO SCHEMA =====
 async function inicializar() {
     const conn = await pool.getConnection();
