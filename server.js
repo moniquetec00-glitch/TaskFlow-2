@@ -95,6 +95,6 @@ async function main() {
 }
 
 main().catch(err => {
-    console.error("\x1b[31m[FATAL]\x1b[0m Falha ao iniciar:", err.message);
+    console.error("[FATAL] Falha ao iniciar:", err.message, err.stack);
     process.exit(1);
 });
