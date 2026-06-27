@@ -100,5 +100,3 @@ main().catch(err => {
     console.error("[FATAL] Falha ao iniciar:", err.message, err.stack);
     process.exit(1);
 });
-
-rotasAdmin.registrar(router);
