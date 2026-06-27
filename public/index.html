@@ -130,6 +130,7 @@
             <a href="#" data-page="kanban"><i class="bi bi-kanban"></i> Kanban</a>
             <a href="#" data-page="usuarios"><i class="bi bi-people"></i> Usuários</a>
             <a href="#" data-page="configuracoes"><i class="bi bi-gear"></i> Configurações</a>
+            <a href="#" data-page="admin" id="menu-admin" style="display:none"><i class="bi bi-shield-lock"></i> Admin</a>
         </nav>
         <div class="sidebar-footer">
             <button class="btn-logout" data-action="logout">
@@ -211,6 +212,17 @@
                 <label>E-mail</label><input id="cfg-email" type="email" value="" readonly style="opacity:.6;cursor:not-allowed">
                 <button class="btn-salvar" data-action="salvar-config">Salvar</button>
             </div>
+        </section>
+
+        <!-- ADMIN -->
+        <section class="pagina" id="pg-admin" style="display:none">
+        <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+            <h3 style="margin:0">Usuários cadastrados</h3>
+            <span id="admin-total" style="font-size:13px;color:#64748B"></span>
+            </div>
+            <div id="lista-admin-usuarios"></div>
+        </div>
         </section>
 
     </main>
@@ -410,5 +422,6 @@
     });
 })();
 </script>
+
 </body>
 </html>

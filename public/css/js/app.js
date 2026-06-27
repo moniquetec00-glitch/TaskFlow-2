@@ -112,6 +112,7 @@ async function ir(pg) {
     if (pg === "tarefas")    renderTarefas();
     if (pg === "kanban")     renderKanban("kanban-pagina");
     if (pg === "usuarios")   renderUsuarios();
+    if (pg === "admin")      renderAdmin();
 }
 
 // ===== MODAIS =====
@@ -426,19 +427,61 @@ document.addEventListener("click", e => {
         case "concluir-primeira":        concluirPrimeira(); break;
         case "excluir-ultima-concluida": excluirUltimaConcluida(); break;
         case "logout":                   logout(); break;
-    }
-});
+        case "promover-admin":
+            confirmar("Tornar este usuário administrador?", async () => {
+                await req("PUT", `/admin/usuarios/${id}/role`, { role: "admin" });
+                toast("Usuário promovido a admin!");
+                renderAdmin();
+            });
+            break;
+        case "rebaixar-admin":
+            confirmar("Remover permissão de admin deste usuário?", async () => {
+                await req("PUT", `/admin/usuarios/${id}/role`, { role: "membro" });
+                toast("Permissão de admin removida.");
+                renderAdmin();
+            });
+            break;
+            }
+        });
 
 document.addEventListener("keydown", e => {
     if (e.key === "Escape")
         document.querySelectorAll(".modal-overlay.aberto").forEach(m => m.classList.remove("aberto"));
 });
 
+// ===== ADMIN =====
+async function renderAdmin() {
+    const c = $("lista-admin-usuarios"); if (!c) return;
+    try {
+        const usuarios = await req("GET", "/admin/usuarios");
+        $("admin-total").textContent = `${usuarios.length} usuário(s) cadastrado(s)`;
+        c.innerHTML = usuarios.map(u => `
+            <div class="item-card">
+                <div class="avatar">${u.nome[0].toUpperCase()}</div>
+                <div class="item-card-info">
+                    <h5>${u.nome} ${u.role === 'admin' ? '<span style="background:#DBEAFE;color:#1D4ED8;font-size:11px;padding:2px 8px;border-radius:99px;font-weight:700">ADMIN</span>' : ''}</h5>
+                    <p>${u.email} · ${u.cargo}</p>
+                    <p style="font-size:11px;color:#94A3B8">Cadastrado em: ${new Date(u.criado_em).toLocaleDateString('pt-BR')}</p>
+                </div>
+                <div class="item-card-btns">
+                    ${u.role !== 'admin'
+                        ? `<button class="btn-ic verde" data-action="promover-admin" data-id="${u.id}"><i class="bi bi-shield-check"></i> Tornar admin</button>`
+                        : `<button class="btn-ic amarelo" data-action="rebaixar-admin" data-id="${u.id}"><i class="bi bi-shield-x"></i> Remover admin</button>`
+                    }
+                </div>
+            </div>`).join("");
+    } catch(e) { c.innerHTML = `<p style='color:red'>${e.message}</p>`; }
+}
+
 // ===== INIT =====
 window.addEventListener("load", () => {
     if (auth.logado()) {
         preencherPerfil();
+        const u = auth.usuario();
+        if (u && u.role === "admin") {
+            const menuAdmin = document.getElementById("menu-admin");
+            if (menuAdmin) menuAdmin.style.display = "block";
+        }
         ir("dashboard");
     }
-    // Se não logado, a tela de auth (login.html) já está visível — nada a fazer aqui.
 });
