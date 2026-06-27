@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskFlow</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ================================================================
+     TELA DE AUTENTICAÇÃO (visível quando não há sessão)
+     ================================================================ -->
+<div id="tela-auth">
+    <div class="auth-container">
+
+        <!-- Painel esquerdo: marca -->
+        <div class="auth-brand">
+            <div class="auth-brand-inner">
+                <h1>TaskFlow</h1>
+                <p>Organize projetos, acompanhe tarefas e colabore — tudo em um lugar só.</p>
+                <ul class="auth-features">
+                    <li><i class="bi bi-check-circle-fill"></i> Kanban visual em tempo real</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Projetos com controle de progresso</li>
+                    <li><i class="bi bi-check-circle-fill"></i> Seus dados privados e seguros</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Painel direito: formulário -->
+        <div class="auth-form-panel">
+            <div class="auth-form-box">
+
+                <!-- Abas Login / Criar conta -->
+                <div class="auth-tabs">
+                    <button class="auth-tab ativo" data-tab="login">Entrar</button>
+                    <button class="auth-tab" data-tab="registro">Criar conta</button>
+                </div>
+
+                <!-- LOGIN -->
+                <div id="form-login" class="auth-form-section">
+                    <p class="auth-subtitle">Bem-vindo de volta! Insira suas credenciais.</p>
+                    <div class="auth-field">
+                        <label>E-mail</label>
+                        <div class="auth-input-wrap">
+                            <i class="bi bi-envelope"></i>
+                            <input id="l-email" type="email" placeholder="seu@email.com" autocomplete="email">
+                        </div>
+                    </div>
+                    <div class="auth-field">
+                        <label>Senha</label>
+                        <div class="auth-input-wrap">
+                            <i class="bi bi-lock"></i>
+                            <input id="l-senha" type="password" placeholder="••••••••" autocomplete="current-password">
+                            <button class="auth-toggle-senha" data-target="l-senha" tabindex="-1"><i class="bi bi-eye"></i></button>
+                        </div>
+                    </div>
+                    <div id="l-erro" class="auth-erro"></div>
+                    <button class="auth-btn-submit" data-action="fazer-login">
+                        <span class="auth-btn-text">Entrar</span>
+                        <span class="auth-btn-loading" style="display:none"><i class="bi bi-arrow-repeat auth-spin"></i></span>
+                    </button>
+                    <p class="auth-switch">Não tem conta? <a href="#" data-tab="registro">Crie agora</a></p>
+                </div>
+
+                <!-- REGISTRO -->
+                <div id="form-registro" class="auth-form-section" style="display:none">
+                    <p class="auth-subtitle">Crie sua conta gratuita em segundos.</p>
+                    <div class="auth-field">
+                        <label>Nome completo</label>
+                        <div class="auth-input-wrap">
+                            <i class="bi bi-person"></i>
+                            <input id="r-nome" type="text" placeholder="Seu Nome" autocomplete="name">
+                        </div>
+                    </div>
+                    <div class="auth-field">
+                        <label>E-mail</label>
+                        <div class="auth-input-wrap">
+                            <i class="bi bi-envelope"></i>
+                            <input id="r-email" type="email" placeholder="seu@email.com" autocomplete="email">
+                        </div>
+                    </div>
+                    <div class="auth-field">
+                        <label>Cargo <span style="color:#64748B;font-weight:400">(opcional)</span></label>
+                        <div class="auth-input-wrap">
+                            <i class="bi bi-briefcase"></i>
+                            <input id="r-cargo" type="text" placeholder="Ex: Desenvolvedor">
+                        </div>
+                    </div>
+                    <div class="auth-field">
+                        <label>Senha <span style="color:#64748B;font-weight:400">(mín. 6 caracteres)</span></label>
+                        <div class="auth-input-wrap">
+                            <i class="bi bi-lock"></i>
+                            <input id="r-senha" type="password" placeholder="••••••••" autocomplete="new-password">
+                            <button class="auth-toggle-senha" data-target="r-senha" tabindex="-1"><i class="bi bi-eye"></i></button>
+                        </div>
+                    </div>
+                    <div id="r-erro" class="auth-erro"></div>
+                    <button class="auth-btn-submit" data-action="fazer-registro">
+                        <span class="auth-btn-text">Criar conta</span>
+                        <span class="auth-btn-loading" style="display:none"><i class="bi bi-arrow-repeat auth-spin"></i></span>
+                    </button>
+                    <p class="auth-switch">Já tem conta? <a href="#" data-tab="login">Entrar</a></p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ================================================================
+     APP PRINCIPAL (oculto até autenticação)
+     ================================================================ -->
+<div id="app-principal" style="display:none">
+<div class="container-app">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="logo">
+            <h2>TaskFlow</h2>
+            <p>Gerenciamento de Projetos</p>
+        </div>
+        <nav class="menu">
+            <a href="#" data-page="dashboard"><i class="bi bi-speedometer2"></i> Dashboard</a>
+            <a href="#" data-page="projetos"><i class="bi bi-folder2-open"></i> Projetos</a>
+            <a href="#" data-page="tarefas"><i class="bi bi-list-task"></i> Tarefas</a>
+            <a href="#" data-page="kanban"><i class="bi bi-kanban"></i> Kanban</a>
+            <a href="#" data-page="usuarios"><i class="bi bi-people"></i> Usuários</a>
+            <a href="#" data-page="configuracoes"><i class="bi bi-gear"></i> Configurações</a>
+        </nav>
+        <div class="sidebar-footer">
+            <button class="btn-logout" data-action="logout">
+                <i class="bi bi-box-arrow-left"></i> Sair
+            </button>
+        </div>
+    </aside>
+
+    <!-- CONTEÚDO -->
+    <main class="content">
+
+        <header>
+            <h1 id="titulo-pagina">Dashboard</h1>
+            <div class="perfil">
+                <img src="https://i.pravatar.cc/60" alt="Foto">
+                <div>
+                    <strong id="perfil-nome">Usuário</strong>
+                    <small id="perfil-email">email@taskflow.com</small>
+                </div>
+            </div>
+        </header>
+
+        <!-- DASHBOARD -->
+        <section id="pg-dashboard">
+            <div class="acoes">
+                <button class="btn-acao" data-action="nova-tarefa"><i class="bi bi-plus-circle-fill"></i> Nova Tarefa</button>
+                <button class="btn-acao" data-action="concluir-primeira"><i class="bi bi-check-circle-fill"></i> Concluir</button>
+                <button class="btn-acao" data-action="excluir-ultima-concluida"><i class="bi bi-trash-fill"></i> Excluir</button>
+            </div>
+            <div class="cards">
+                <div class="card-stat"><i class="bi bi-folder-fill"></i><h3>Projetos</h3><span id="stat-projetos">0</span></div>
+                <div class="card-stat"><i class="bi bi-list-task"></i><h3>Tarefas</h3><span id="stat-tarefas">0</span></div>
+                <div class="card-stat"><i class="bi bi-check-circle-fill"></i><h3>Concluídas</h3><span id="stat-concluidas">0</span></div>
+                <div class="card-stat"><i class="bi bi-people-fill"></i><h3>Usuários</h3><span id="stat-usuarios">0</span></div>
+            </div>
+            <div class="kanban" id="kanban-dashboard"></div>
+        </section>
+
+        <!-- PROJETOS -->
+        <section id="pg-projetos" class="pagina">
+            <div class="pg-header">
+                <h2>Projetos</h2>
+                <button class="btn-acao" data-action="novo-projeto"><i class="bi bi-plus-circle-fill"></i> Novo Projeto</button>
+            </div>
+            <div id="lista-projetos" class="lista"></div>
+        </section>
+
+        <!-- TAREFAS -->
+        <section id="pg-tarefas" class="pagina">
+            <div class="pg-header">
+                <h2>Tarefas</h2>
+                <button class="btn-acao" data-action="nova-tarefa"><i class="bi bi-plus-circle-fill"></i> Nova Tarefa</button>
+            </div>
+            <div id="lista-tarefas" class="lista"></div>
+        </section>
+
+        <!-- KANBAN -->
+        <section id="pg-kanban" class="pagina">
+            <div class="pg-header">
+                <h2>Kanban</h2>
+                <button class="btn-acao" data-action="nova-tarefa"><i class="bi bi-plus-circle-fill"></i> Nova Tarefa</button>
+            </div>
+            <div class="kanban" id="kanban-pagina"></div>
+        </section>
+
+        <!-- USUARIOS -->
+        <section id="pg-usuarios" class="pagina">
+            <div class="pg-header">
+                <h2>Usuários</h2>
+            </div>
+            <div id="lista-usuarios" class="lista"></div>
+        </section>
+
+        <!-- CONFIGURAÇÕES -->
+        <section id="pg-configuracoes" class="pagina">
+            <h2 style="margin-bottom:24px">Configurações</h2>
+            <div class="config-card">
+                <label>Nome</label><input id="cfg-nome" type="text" value="">
+                <label>E-mail</label><input id="cfg-email" type="email" value="" readonly style="opacity:.6;cursor:not-allowed">
+                <button class="btn-salvar" data-action="salvar-config">Salvar</button>
+            </div>
+        </section>
+
+    </main>
+</div>
+</div><!-- /app-principal -->
+
+<!-- MODAL TAREFA -->
+<div id="modal-tarefa" class="modal-overlay">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3 id="modal-tarefa-titulo">Nova Tarefa</h3>
+            <button class="modal-x" data-close="tarefa">&#x2715;</button>
+        </div>
+        <label>Título *</label>
+        <input id="t-titulo" type="text" placeholder="Ex: Criar wireframes do dashboard">
+        <label>Descrição</label>
+        <textarea id="t-desc" placeholder="Descreva a tarefa..." rows="3"></textarea>
+        <div class="form-grid">
+            <div><label>Projeto</label><select id="t-projeto"></select></div>
+            <div><label>Prioridade</label>
+                <select id="t-prioridade">
+                    <option value="alta">Alta</option>
+                    <option value="media" selected>Média</option>
+                    <option value="baixa">Baixa</option>
+                </select>
+            </div>
+            <div><label>Status</label>
+                <select id="t-status">
+                    <option value="afazer">A Fazer</option>
+                    <option value="andamento">Em Andamento</option>
+                    <option value="concluido">Concluído</option>
+                </select>
+            </div>
+            <div><label>Prazo</label><input id="t-prazo" type="date"></div>
+        </div>
+        <input type="hidden" id="t-edit-id">
+        <div class="modal-footer">
+            <button class="btn-cancelar" data-close="tarefa">Cancelar</button>
+            <button class="btn-salvar" data-action="salvar-tarefa">Salvar Tarefa</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL PROJETO -->
+<div id="modal-projeto" class="modal-overlay">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3>Novo Projeto</h3>
+            <button class="modal-x" data-close="projeto">&#x2715;</button>
+        </div>
+        <label>Nome *</label>
+        <input id="p-nome" type="text" placeholder="Ex: Site da Empresa">
+        <label>Descrição</label>
+        <textarea id="p-desc" placeholder="Descreva o projeto..." rows="3"></textarea>
+        <div class="form-grid">
+            <div><label>Cor</label><input id="p-cor" type="color" value="#84CC16"></div>
+            <div><label>Prazo</label><input id="p-prazo" type="date"></div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancelar" data-close="projeto">Cancelar</button>
+            <button class="btn-salvar" data-action="salvar-projeto">Salvar Projeto</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL CONFIRMAÇÃO -->
+<div id="modal-confirm" class="modal-overlay">
+    <div class="modal-box" style="max-width:400px;text-align:center">
+        <div class="icone-aviso"><i class="bi bi-exclamation-triangle-fill"></i></div>
+        <h3 style="margin-bottom:8px">Confirmar exclusão</h3>
+        <p id="confirm-msg" style="color:#94A3B8;margin-bottom:28px"></p>
+        <div class="modal-footer" style="justify-content:center">
+            <button class="btn-cancelar" data-close="confirm">Cancelar</button>
+            <button class="btn-excluir" data-action="executar-confirm">Excluir</button>
+        </div>
+    </div>
+</div>
+
+<script src="css/js/api.js"></script>
+<script src="css/js/app.js"></script>
+<script>
+// ===== CONTROLADOR DA TELA DE AUTH =====
+(function () {
+    const telaAuth = document.getElementById("tela-auth");
+    const appPrincipal = document.getElementById("app-principal");
+
+    function mostrarApp() {
+        telaAuth.style.display = "none";
+        appPrincipal.style.display = "block";
+    }
+
+    function mostrarAuth() {
+        telaAuth.style.display = "block";
+        appPrincipal.style.display = "none";
+    }
+
+    // Verifica token ao carregar
+    if (auth.logado()) {
+        mostrarApp();
+    } else {
+        mostrarAuth();
+    }
+
+    // ---- Abas ----
+    function trocarAba(tab) {
+        document.querySelectorAll(".auth-tab").forEach(t => t.classList.toggle("ativo", t.dataset.tab === tab));
+        document.getElementById("form-login").style.display   = tab === "login"    ? "block" : "none";
+        document.getElementById("form-registro").style.display = tab === "registro" ? "block" : "none";
+        document.getElementById("l-erro").textContent = "";
+        document.getElementById("r-erro").textContent = "";
+    }
+
+    // ---- Toggle senha ----
+    function toggleSenha(targetId) {
+        const input = document.getElementById(targetId);
+        if (!input) return;
+        input.type = input.type === "password" ? "text" : "password";
+    }
+
+    // ---- Botão de envio: estado loading ----
+    function setBtnLoading(btn, loading) {
+        btn.disabled = loading;
+        btn.querySelector(".auth-btn-text").style.display   = loading ? "none"   : "inline";
+        btn.querySelector(".auth-btn-loading").style.display = loading ? "inline" : "none";
+    }
+
+    // ---- Login ----
+    async function fazerLogin() {
+        const email = document.getElementById("l-email").value.trim();
+        const senha = document.getElementById("l-senha").value;
+        const erroEl = document.getElementById("l-erro");
+        const btn = document.querySelector("[data-action='fazer-login']");
+
+        erroEl.textContent = "";
+        if (!email || !senha) { erroEl.textContent = "Preencha e-mail e senha."; return; }
+
+        setBtnLoading(btn, true);
+        try {
+            const data = await api.login({ email, senha });
+            auth.salvar(data.token, data.usuario);
+            mostrarApp();
+            preencherPerfil();
+            ir("dashboard");
+        } catch (e) {
+            erroEl.textContent = e.message || "Falha no login.";
+        } finally {
+            setBtnLoading(btn, false);
+        }
+    }
+
+    // ---- Registro ----
+    async function fazerRegistro() {
+        const nome  = document.getElementById("r-nome").value.trim();
+        const email = document.getElementById("r-email").value.trim();
+        const senha = document.getElementById("r-senha").value;
+        const cargo = document.getElementById("r-cargo").value.trim();
+        const erroEl = document.getElementById("r-erro");
+        const btn = document.querySelector("[data-action='fazer-registro']");
+
+        erroEl.textContent = "";
+        if (!nome || !email || !senha) { erroEl.textContent = "Nome, e-mail e senha são obrigatórios."; return; }
+        if (senha.length < 6)          { erroEl.textContent = "A senha deve ter ao menos 6 caracteres."; return; }
+
+        setBtnLoading(btn, true);
+        try {
+            const data = await api.registrar({ nome, email, senha, cargo });
+            auth.salvar(data.token, data.usuario);
+            mostrarApp();
+            preencherPerfil();
+            ir("dashboard");
+        } catch (e) {
+            erroEl.textContent = e.message || "Falha ao criar conta.";
+        } finally {
+            setBtnLoading(btn, false);
+        }
+    }
+
+    // ---- Delegação de eventos da tela de auth ----
+    telaAuth.addEventListener("click", e => {
+        const tab = e.target.dataset.tab || e.target.closest("[data-tab]")?.dataset.tab;
+        if (tab) { trocarAba(tab); return; }
+
+        const toggle = e.target.closest(".auth-toggle-senha");
+        if (toggle) { toggleSenha(toggle.dataset.target); return; }
+
+        const action = e.target.dataset.action;
+        if (action === "fazer-login")    { fazerLogin(); return; }
+        if (action === "fazer-registro") { fazerRegistro(); return; }
+    });
+
+    // Enter submete o formulário correto
+    telaAuth.addEventListener("keydown", e => {
+        if (e.key !== "Enter") return;
+        const loginVisivel = document.getElementById("form-login").style.display !== "none";
+        if (loginVisivel) fazerLogin();
+        else              fazerRegistro();
+    });
+})();
+</script>
+</body>
+</html>
