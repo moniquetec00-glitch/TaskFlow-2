@@ -536,14 +536,16 @@ document.getElementById("cfg-avatar-input").addEventListener("change", async (e)
 // ===== INIT =====
 window.addEventListener("load", async () => {
     if (auth.logado()) {
-        preencherPerfil();
         try {
             const me = await req("GET", "/auth/me");
+            preencherPerfil();
+            const foto = document.getElementById("perfil-foto");
+            if (foto && me.avatar) foto.src = me.avatar;
             if (me && me.role === "admin") {
                 const menuAdmin = document.getElementById("menu-admin");
                 if (menuAdmin) menuAdmin.style.display = "block";
             }
-        } catch(e) {}
+        } catch(e) { preencherPerfil(); }
         ir("dashboard");
     }
 });
