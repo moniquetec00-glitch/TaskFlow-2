@@ -72,7 +72,7 @@ function registrar(router) {
     router.get("/api/auth/me", autenticar, async (req, res) => {
         const u = await db.getUsuarioPorId(req.usuarioId);
         if (!u) return res.json({ erro: "Usuário não encontrado." }, 404);
-        res.json({ id: u.id, nome: u.nome, email: u.email, cargo: u.cargo, role: u.role });
+        res.json({ id: u.id, nome: u.nome, email: u.email, cargo: u.cargo, role: u.role, avatar: u.avatar });
     });
 }
 
