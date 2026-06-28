@@ -42,7 +42,7 @@ function setLoading(show) {
 }
 
 // ===== PERFIL =====
-function preencherPerfil() {
+async function preencherPerfil() {
     const u = auth.usuario();
     if (!u) return;
     const nome  = $("perfil-nome");
@@ -53,8 +53,17 @@ function preencherPerfil() {
     if (email)    email.textContent = u.email;
     if (cfgNome)  cfgNome.value     = u.nome;
     if (cfgEmail) cfgEmail.value    = u.email;
-}
 
+    // Busca avatar do servidor
+    try {
+        const me = await req("GET", "/auth/me");
+        if (me.avatar) {
+            const foto = document.getElementById("perfil-foto");
+            if (foto) foto.src = me.avatar;
+        }
+        }
+    } catch(e) {}
+}
 // ===== LOGOUT =====
 function logout() {
     auth.limpar();
@@ -467,7 +476,7 @@ async function renderAdmin() {
         $("admin-total").textContent = `${usuarios.length} usuário(s) cadastrado(s)`;
         c.innerHTML = usuarios.map(u => `
             <div class="item-card">
-                <div class="avatar">${u.nome[0].toUpperCase()}</div>
+                <div class="avatar" style="${u.avatar ? `background-image:url(${u.avatar});background-size:cover;background-position:center;color:transparent` : ''}">${u.avatar ? '' : u.nome[0].toUpperCase()}</div>
                 <div class="item-card-info">
                     <h5>${u.nome} ${u.role === 'admin' ? '<span style="background:#DBEAFE;color:#1D4ED8;font-size:11px;padding:2px 8px;border-radius:99px;font-weight:700">ADMIN</span>' : ''}</h5>
                     <p>${u.email} · ${u.cargo}</p>
