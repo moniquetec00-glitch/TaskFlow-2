@@ -13,23 +13,36 @@ const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 *
 
 function registrar(router) {
     router.post("/api/usuarios/avatar", autenticar, upload.single("avatar"), async (req, res) => {
-        if (!req.file) return res.json({ erro: "Nenhum arquivo enviado." }, 400);
+        try {
+            if (!req.file) return res.json({ erro: "Nenhum arquivo enviado." }, 400);
 
-        const result = await new Promise((resolve, reject) => {
-            cloudinary.uploader.upload_stream(
-                { folder: "taskflow/avatars", public_id: req.usuario.id, overwrite: true, transformation: [{ width: 200, height: 200, crop: "fill" }] },
-                (err, result) => err ? reject(err) : resolve(result)
-            ).end(req.file.buffer);
-        });
+            const result = await new Promise((resolve, reject) => {
+                const stream = cloudinary.uploader.upload_stream(
+                    { folder: "taskflow/avatars", public_id: req.usuario.id, overwrite: true, transformation: [{ width: 200, height: 200, crop: "fill" }] },
+                    (err, result) => {
+                        if (err) reject(err);
+                        else resolve(result);
+                    }
+                );
+                stream.end(req.file.buffer);
+            });
 
-        await db.atualizarAvatar(req.usuario.id, result.secure_url);
-        res.json({ avatar: result.secure_url });
+            await db.atualizarAvatar(req.usuario.id, result.secure_url);
+            res.json({ avatar: result.secure_url });
+        } catch(e) {
+            console.error("Erro no upload:", e.message);
+            res.json({ erro: "Erro ao fazer upload: " + e.message }, 500);
+        }
     });
 
     router.delete("/api/usuarios/avatar", autenticar, async (req, res) => {
-        await cloudinary.uploader.destroy(`taskflow/avatars/${req.usuario.id}`).catch(() => {});
-        await db.atualizarAvatar(req.usuario.id, null);
-        res.json({ mensagem: "Avatar removido." });
+        try {
+            await cloudinary.uploader.destroy(`taskflow/avatars/${req.usuario.id}`).catch(() => {});
+            await db.atualizarAvatar(req.usuario.id, null);
+            res.json({ mensagem: "Avatar removido." });
+        } catch(e) {
+            res.json({ erro: "Erro ao remover avatar." }, 500);
+        }
     });
 }
 
