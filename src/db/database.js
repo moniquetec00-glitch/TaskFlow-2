@@ -293,7 +293,7 @@ const db = {
 
     async getUsuariosTodos() {
         const [rows] = await pool.execute(
-            "SELECT id, nome, email, cargo, role, criado_em FROM usuarios ORDER BY criado_em DESC"
+            "SELECT id, nome, email, cargo, role, avatar, criado_em FROM usuarios ORDER BY criado_em DESC"
         );
         return rows;
     },
