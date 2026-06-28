@@ -1,143 +1,147 @@
-# TaskFlow v2 — Auth + MySQL
+# TaskFlow v2
 
-Gerenciamento de projetos e tarefas com **autenticação JWT** e banco de dados **MySQL**.  
-Cada usuário tem sua própria conta, sessão segura e dados completamente isolados.
+Sistema de gerenciamento de projetos e tarefas com autenticação JWT, banco de dados MySQL e upload de avatar via Cloudinary.
+
+🌐 **Deploy:** https://flowtask.up.railway.app
 
 ---
 
-## Estrutura do Projeto
+## Funcionalidades
+
+- Cadastro e login de usuários com JWT
+- Dashboard com estatísticas
+- Gerenciamento de projetos e tarefas
+- Quadro Kanban
+- Upload de foto de perfil (Cloudinary)
+- Painel administrativo (apenas admins)
+- Promoção/remoção de administradores
+
+---
+
+## Estrutura do projeto
 
 ```
 taskflow/
-├── server.js                    ← Ponto de entrada
+├── server.js                  ← Ponto de entrada
 ├── package.json
-├── .env.example                 ← Copie para .env e configure
+├── .env.example               ← Modelo de variáveis de ambiente
 ├── src/
-│   ├── router.js
-│   ├── middleware.js
+│   ├── router.js              ← Roteador HTTP
+│   ├── middleware.js          ← CORS, bodyParser, static, logger
 │   ├── middleware/
-│   │   └── auth.js              ← Validação do JWT (Bearer token)
+│   │   └── auth.js            ← Validação JWT
 │   ├── db/
-│   │   └── database.js          ← Camada MySQL (pool de conexões)
+│   │   └── database.js        ← Pool MySQL + schema automático
 │   └── routes/
-│       ├── auth.js              ← POST /api/auth/registrar | login | GET /me
-│       ├── tarefas.js
-│       ├── projetos.js
-│       ├── usuarios.js
-│       └── stats.js
+│       ├── auth.js            ← /api/auth/*
+│       ├── tarefas.js         ← /api/tarefas/*
+│       ├── projetos.js        ← /api/projetos/*
+│       ├── usuarios.js        ← /api/usuarios
+│       ├── stats.js           ← /api/stats
+│       ├── admin.js           ← /api/admin/* (apenas admins)
+│       └── upload.js          ← /api/usuarios/avatar
 └── public/
-    ├── index.html               ← SPA com tela de login integrada
+    ├── index.html
     └── css/
         ├── style.css
         └── js/
-            ├── api.js           ← Fetch wrapper com JWT
-            └── app.js           ← Lógica do frontend
+            ├── api.js
+            └── app.js
 ```
 
 ---
 
-## Pré-requisitos
+## Como rodar localmente
 
-- **Node.js v18+**
-- **MySQL 8+** (ou MariaDB 10.5+)
+### Pré-requisitos
 
----
+- Node.js v18+
+- MySQL 8+
+- Conta no Cloudinary (gratuita)
 
-## Configuração
+### Passos
 
-### 1. Instalar dependências
+1. Clone o repositório:
+```bash
+git clone https://github.com/VitorLopz/tasflow.git
+cd tasflow
+```
 
+2. Instale as dependências:
 ```bash
 npm install
 ```
 
-Isso instala: `mysql2`, `jsonwebtoken`, `bcryptjs`.
-
-### 2. Criar banco de dados MySQL
-
+3. Crie o banco de dados no MySQL:
 ```sql
 CREATE DATABASE taskflow CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
-O schema (tabelas) é criado **automaticamente** ao iniciar o servidor.
-
-### 3. Configurar variáveis de ambiente
-
+4. Configure as variáveis de ambiente:
 ```bash
 cp .env.example .env
 ```
+Edite o `.env` com suas credenciais.
 
-Edite `.env`:
-
-```env
-DB_HOST=localhost
-DB_PORT=3306
-DB_USER=root
-DB_PASSWORD=sua_senha
-DB_NAME=taskflow
-JWT_SECRET=troque_por_algo_longo_e_aleatorio
-PORT=3000
-```
-
-### 4. Iniciar
-
+5. Inicie o servidor:
 ```bash
 node server.js
-# ou em modo dev (Node v18+)
-node --watch server.js
 ```
 
-Acesse: **http://localhost:3000**
+6. Acesse: http://localhost:3000
 
 ---
 
-## Fluxo de Autenticação
+## Variáveis de ambiente
 
-```
-Usuário → POST /api/auth/registrar  →  cria conta  →  retorna { token, usuario }
-Usuário → POST /api/auth/login      →  autentica   →  retorna { token, usuario }
-App     → guarda token no localStorage
-App     → todas as requisições seguintes enviam: Authorization: Bearer <token>
-Servidor → valida JWT em cada rota protegida → filtra dados pelo usuario_id
-```
-
-O token expira em **7 dias**. Ao expirar, o app redireciona para a tela de login.
-
----
-
-## API REST
-
-### Públicas (sem token)
-| Método | Endpoint              | Descrição         |
-|--------|-----------------------|-------------------|
-| POST   | `/api/auth/registrar` | Cria conta        |
-| POST   | `/api/auth/login`     | Autentica usuário |
-
-### Protegidas (Bearer token obrigatório)
-| Método | Endpoint              | Descrição              |
-|--------|-----------------------|------------------------|
-| GET    | `/api/auth/me`        | Dados do usuário logado|
-| GET    | `/api/stats`          | Contagens do dashboard |
-| GET    | `/api/tarefas`        | Lista tarefas do usuário |
-| POST   | `/api/tarefas`        | Cria tarefa            |
-| GET    | `/api/tarefas/:id`    | Busca tarefa           |
-| PUT    | `/api/tarefas/:id`    | Atualiza tarefa        |
-| DELETE | `/api/tarefas/:id`    | Exclui tarefa          |
-| GET    | `/api/projetos`       | Lista projetos do usuário |
-| POST   | `/api/projetos`       | Cria projeto           |
-| PUT    | `/api/projetos/:id`   | Atualiza projeto       |
-| DELETE | `/api/projetos/:id`   | Exclui projeto         |
-| GET    | `/api/usuarios`       | Perfil do usuário logado |
+| Variável | Descrição |
+|---|---|
+| `DB_HOST` | Host do MySQL |
+| `DB_PORT` | Porta do MySQL (padrão: 3306) |
+| `DB_USER` | Usuário do MySQL |
+| `DB_PASSWORD` | Senha do MySQL |
+| `DB_NAME` | Nome do banco (taskflow) |
+| `JWT_SECRET` | Chave secreta para tokens JWT |
+| `PORT` | Porta do servidor (padrão: 3000) |
+| `CLOUDINARY_CLOUD_NAME` | Cloud name do Cloudinary |
+| `CLOUDINARY_API_KEY` | API Key do Cloudinary |
+| `CLOUDINARY_API_SECRET` | API Secret do Cloudinary |
 
 ---
 
-## Segurança implementada
+## Deploy (Railway)
 
-| Mecanismo          | Detalhes                                           |
-|--------------------|----------------------------------------------------|
-| Senhas             | Hash com `bcryptjs` (salt rounds = 10)             |
-| Sessão             | JWT assinado com `jsonwebtoken` (expira em 7 dias) |
-| Isolamento         | Todas as queries filtram por `usuario_id`          |
-| CORS               | Headers configuráveis no middleware                |
-| Path traversal     | Bloqueado no servidor de arquivos estáticos        |
-| SQL Injection      | Queries parametrizadas via `mysql2` prepared stmts |
+O projeto está configurado para deploy automático no Railway via GitHub.
+
+Variáveis de ambiente configuradas no Railway com referências ao MySQL interno:
+
+```
+DB_HOST=${{MySQL.MYSQLHOST}}
+DB_PORT=${{MySQL.MYSQLPORT}}
+DB_USER=${{MySQL.MYSQLUSER}}
+DB_PASSWORD=${{MySQL.MYSQLPASSWORD}}
+DB_NAME=${{MySQL.MYSQLDATABASE}}
+MYSQL_URL=${{MySQL.MYSQL_URL}}
+```
+
+---
+
+## Painel Admin
+
+O primeiro usuário admin deve ser promovido manualmente via banco de dados:
+
+```sql
+UPDATE usuarios SET role = 'admin' WHERE email = 'seu@email.com';
+```
+
+Após isso, o painel Admin fica disponível na sidebar para promover/rebaixar outros usuários.
+
+---
+
+## Tecnologias
+
+- **Backend:** Node.js, mysql2, jsonwebtoken, bcryptjs, cloudinary, multer
+- **Frontend:** HTML, CSS, JavaScript puro, Bootstrap Icons
+- **Banco:** MySQL 8
+- **Hospedagem:** Railway
+- **Armazenamento de imagens:** Cloudinary
