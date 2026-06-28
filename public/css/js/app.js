@@ -474,14 +474,16 @@ async function renderAdmin() {
 }
 
 // ===== INIT =====
-window.addEventListener("load", () => {
+window.addEventListener("load", async () => {
     if (auth.logado()) {
         preencherPerfil();
-        const u = auth.usuario();
-        if (u && u.role === "admin") {
-            const menuAdmin = document.getElementById("menu-admin");
-            if (menuAdmin) menuAdmin.style.display = "block";
-        }
+        try {
+            const me = await req("GET", "/auth/me");
+            if (me && me.role === "admin") {
+                const menuAdmin = document.getElementById("menu-admin");
+                if (menuAdmin) menuAdmin.style.display = "block";
+            }
+        } catch(e) {}
         ir("dashboard");
     }
 });
