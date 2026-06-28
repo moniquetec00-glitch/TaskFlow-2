@@ -208,6 +208,22 @@
         <section id="pg-configuracoes" class="pagina">
             <h2 style="margin-bottom:24px">Configurações</h2>
             <div class="config-card">
+            <!-- Avatar -->
+            <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px">
+                <div id="cfg-avatar-preview" style="width:80px;height:80px;border-radius:50%;background:#E2E8F0;display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:32px;font-weight:700;color:#64748B">
+                    <span id="cfg-avatar-inicial"></span>
+                    <img id="cfg-avatar-img" style="display:none;width:100%;height:100%;object-fit:cover">
+                </div>
+                <div style="display:flex;flex-direction:column;gap:8px">
+                    <label for="cfg-avatar-input" class="btn-salvar" style="cursor:pointer;display:inline-block">
+                        <i class="bi bi-camera"></i> Alterar foto
+                    </label>
+                    <input type="file" id="cfg-avatar-input" accept="image/*" style="display:none">
+                    <button class="btn-ic" id="cfg-avatar-remover" style="display:none;color:#EF4444;border-color:#EF4444" data-action="remover-avatar">
+                        <i class="bi bi-trash"></i> Remover foto
+                    </button>
+                </div>
+            </div>
                 <label>Nome</label><input id="cfg-nome" type="text" value="">
                 <label>E-mail</label><input id="cfg-email" type="email" value="" readonly style="opacity:.6;cursor:not-allowed">
                 <button class="btn-salvar" data-action="salvar-config">Salvar</button>

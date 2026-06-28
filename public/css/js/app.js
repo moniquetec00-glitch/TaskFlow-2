@@ -113,6 +113,9 @@ async function ir(pg) {
     if (pg === "kanban")     renderKanban("kanban-pagina");
     if (pg === "usuarios")   renderUsuarios();
     if (pg === "admin")      renderAdmin();
+    if (pg === "configuracoes") {
+    req("GET", "/auth/me").then(me => atualizarAvatarUI(me.avatar, me.nome)).catch(() => {});
+}
 }
 
 // ===== MODAIS =====
@@ -441,6 +444,13 @@ document.addEventListener("click", e => {
                 renderAdmin();
             });
             break;
+        case "remover-avatar":
+            confirmar("Remover sua foto de perfil?", async () => {
+                await req("DELETE", "/usuarios/avatar");
+                atualizarAvatarUI(null, auth.usuario()?.nome);
+                toast("Foto removida!");
+            });
+            break;
             }
         });
 
@@ -473,6 +483,48 @@ async function renderAdmin() {
     } catch(e) { c.innerHTML = `<p style='color:red'>${e.message}</p>`; }
 }
 
+// ===== AVATAR =====
+function atualizarAvatarUI(url, nome) {
+    const img    = $("cfg-avatar-img");
+    const span   = $("cfg-avatar-inicial");
+    const remover = $("cfg-avatar-remover");
+    const headerImg = document.querySelector(".perfil-foto img") || document.querySelector("#perfil-foto");
+
+    if (url) {
+        img.src = url;
+        img.style.display = "block";
+        span.style.display = "none";
+        if (remover) remover.style.display = "inline-flex";
+        if (headerImg) headerImg.src = url;
+    } else {
+        img.style.display = "none";
+        span.style.display = "block";
+        span.textContent = nome ? nome[0].toUpperCase() : "?";
+        if (remover) remover.style.display = "none";
+    }
+}
+
+document.getElementById("cfg-avatar-input") && 
+document.getElementById("cfg-avatar-input").addEventListener("change", async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const form = new FormData();
+    form.append("avatar", file);
+    try {
+        const res = await fetch("/api/usuarios/avatar", {
+            method: "POST",
+            headers: { Authorization: "Bearer " + localStorage.getItem("tf_token") },
+            body: form
+        });
+        const data = await res.json();
+        if (data.avatar) {
+            atualizarAvatarUI(data.avatar, auth.usuario()?.nome);
+            toast("Foto atualizada!");
+        } else {
+            toast("Erro ao enviar foto.");
+        }
+    } catch(e) { toast("Erro ao enviar foto."); }
+});
 // ===== INIT =====
 window.addEventListener("load", async () => {
     if (auth.logado()) {

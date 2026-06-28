@@ -37,6 +37,7 @@ const rotasProjetos = require("./src/routes/projetos");
 const rotasUsuarios = require("./src/routes/usuarios");
 const rotasStats    = require("./src/routes/stats");
 const rotasAdmin    = require("./src/routes/admin");
+const rotasUpload   = require("./src/routes/upload");
 
 const PORT       = process.env.PORT || 3000;
 const PUBLIC_DIR = path.join(__dirname, "public");
@@ -53,6 +54,7 @@ async function main() {
     rotasUsuarios.registrar(router);
     rotasStats.registrar(router);
     rotasAdmin.registrar(router);
+    rotasUpload.registrar(router);
 
     function pipeline(req, res) {
         const middlewares = [

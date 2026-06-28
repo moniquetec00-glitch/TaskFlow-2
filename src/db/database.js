@@ -45,6 +45,10 @@ async function inicializar() {
         `);
 
         await conn.execute(`
+            ALTER TABLE usuarios ADD COLUMN IF NOT EXISTS avatar VARCHAR(500) NULL
+        `).catch(() => {});
+
+        await conn.execute(`
             CREATE TABLE IF NOT EXISTS projetos (
                 id          CHAR(36)     PRIMARY KEY DEFAULT (UUID()),
                 usuario_id  CHAR(36)     NOT NULL,
@@ -300,6 +304,14 @@ const db = {
             [role, id]
         );
         return true;
+    },
+
+    async atualizarAvatar(id, url) {
+    await pool.execute(
+        "UPDATE usuarios SET avatar = ? WHERE id = ?",
+        [url, id]
+    );
+    return true;
     }
 };
 
