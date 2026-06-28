@@ -61,7 +61,6 @@ async function preencherPerfil() {
             const foto = document.getElementById("perfil-foto");
             if (foto) foto.src = me.avatar;
         }
-        }
     } catch(e) {}
 }
 // ===== LOGOUT =====
