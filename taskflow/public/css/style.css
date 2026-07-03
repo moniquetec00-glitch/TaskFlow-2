@@ -1,12 +1,10 @@
-/* ===== RESET ===== */
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins',sans-serif; }
 body { background:#F5F7FA; color:#1E293B; }
 
-/* ===== LAYOUT ===== */
+
 .container-app { display:flex; min-height:100vh; }
 .content { flex:1; padding:30px; min-width:0; }
 
-/* ===== SIDEBAR ===== */
 .sidebar { width:260px; background:#1E293B; color:white; padding:30px 20px; display:flex; flex-direction:column; flex-shrink:0; }
 .logo h2 { color:#A3E635; font-size:28px; }
 .logo p  { color:#CBD5E1; font-size:13px; margin-bottom:36px; }
@@ -14,7 +12,6 @@ body { background:#F5F7FA; color:#1E293B; }
 .menu a { text-decoration:none; color:#E2E8F0; padding:12px 14px; border-radius:10px; display:flex; align-items:center; gap:10px; transition:.2s; }
 .menu a:hover, .menu a.ativo { background:#334155; color:#A3E635; }
 
-/* ===== SIDEBAR FOOTER / LOGOUT ===== */
 .sidebar-footer { padding-top:20px; border-top:1px solid #334155; margin-top:20px; }
 .btn-logout { width:100%; background:transparent; border:1px solid #334155; color:#94A3B8; padding:10px 14px; border-radius:10px; display:flex; align-items:center; gap:10px; font-size:14px; cursor:pointer; transition:.2s; }
 .btn-logout:hover { background:#EF444422; border-color:#EF4444; color:#EF4444; }
