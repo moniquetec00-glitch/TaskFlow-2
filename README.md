@@ -1,5 +1,3 @@
-![TaskFlow Logo](./public/logo.png)
-
 <img src="./public/logo.png" alt="TaskFlow Logo" width="400"/>
 
 # TaskFlow v2
