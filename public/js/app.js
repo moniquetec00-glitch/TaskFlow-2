@@ -569,22 +569,26 @@ async function renderAdmin() {
 
 // ===== AVATAR =====
 function atualizarAvatarUI(url, nome) {
-    const img    = $("cfg-avatar-img");
-    const span   = $("cfg-avatar-inicial");
+    const img     = $("cfg-avatar-img");
+    const span    = $("cfg-avatar-inicial");
     const remover = $("cfg-avatar-remover");
-    const headerImg = document.querySelector(".perfil-foto img") || document.querySelector("#perfil-foto");
+    const headerImg    = $("perfil-foto");
+    const headerInicial = $("perfil-inicial");
 
     if (url) {
         img.src = url;
         img.style.display = "block";
         span.style.display = "none";
         if (remover) remover.style.display = "inline-flex";
-        if (headerImg) headerImg.src = url;
+        if (headerImg)     { headerImg.src = url; headerImg.style.display = "block"; }
+        if (headerInicial) headerInicial.style.display = "none";
     } else {
         img.style.display = "none";
         span.style.display = "block";
         span.textContent = nome ? nome[0].toUpperCase() : "?";
         if (remover) remover.style.display = "none";
+        if (headerImg)     headerImg.style.display = "none";
+        if (headerInicial) { headerInicial.style.display = "block"; headerInicial.textContent = nome ? nome[0].toUpperCase() : "?"; }
     }
 }
 
@@ -600,7 +604,8 @@ function registrarHistorico(chave, valor) {
 
 function desenharSparkline(svgId, pontos, cor) {
     const svg = $(svgId);
-    if (!svg || pontos.length < 2) { if (svg) svg.innerHTML = ""; return; }
+    if (!svg) return;
+    if (pontos.length < 2) { svg.innerHTML = ""; return; }
 
     const min = Math.min(...pontos);
     const max = Math.max(...pontos);
@@ -608,16 +613,33 @@ function desenharSparkline(svgId, pontos, cor) {
 
     const coords = pontos.map((v, i) => {
         const x = (i / (pontos.length - 1)) * 100;
-        const y = 28 - ((v - min) / range) * 26;
+        const y = 26 - ((v - min) / range) * 22;
         return [x, y];
     });
 
-    const linha = coords.map(([x, y]) => `${x},${y}`).join(" ");
-    const area  = `0,30 ${linha} 100,30`;
+    function curvaSuave(pts) {
+        if (pts.length < 3) return `M${pts[0][0]},${pts[0][1]} L${pts[1][0]},${pts[1][1]}`;
+        let d = `M${pts[0][0]},${pts[0][1]}`;
+        for (let i = 0; i < pts.length - 1; i++) {
+            const p0 = pts[i === 0 ? i : i - 1];
+            const p1 = pts[i];
+            const p2 = pts[i + 1];
+            const p3 = pts[i + 2] || p2;
+            const cp1x = p1[0] + (p2[0] - p0[0]) / 6;
+            const cp1y = p1[1] + (p2[1] - p0[1]) / 6;
+            const cp2x = p2[0] - (p3[0] - p1[0]) / 6;
+            const cp2y = p2[1] - (p3[1] - p1[1]) / 6;
+            d += ` C${cp1x},${cp1y} ${cp2x},${cp2y} ${p2[0]},${p2[1]}`;
+        }
+        return d;
+    }
+
+    const linhaPath = curvaSuave(coords);
+    const areaPath  = `${linhaPath} L100,30 L0,30 Z`;
 
     svg.innerHTML = `
-        <polyline class="linha" points="${linha}" style="stroke:${cor}"></polyline>
-        <polygon class="area" points="${area}" style="fill:${cor}"></polygon>
+        <path d="${areaPath}" fill="${cor}" fill-opacity="0.15" stroke="none"></path>
+        <path d="${linhaPath}" fill="none" stroke="${cor}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path>
     `;
 }
 
@@ -649,7 +671,7 @@ window.addEventListener("load", async () => {
             const me = await req("GET", "/auth/me");
             preencherPerfil();
             const foto = document.getElementById("perfil-foto");
-            if (foto && me.avatar) foto.src = me.avatar;
+            atualizarAvatarUI(me.avatar, me.nome);
             if (me && me.role === "admin") {
                 const menuAdmin = document.getElementById("menu-admin");
                 if (menuAdmin) menuAdmin.style.display = "block";

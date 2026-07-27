@@ -146,7 +146,10 @@
         <header>
             <h1 id="titulo-pagina">Dashboard</h1>
             <div class="perfil">
-                <img id="perfil-foto" src="https://i.pravatar.cc/60" alt="Foto">
+                <div id="perfil-avatar-wrap" style="width:50px;height:50px;border-radius:50%;background:#A3E635;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0">
+                    <span id="perfil-inicial" style="font-weight:700;font-size:19px;color:#1E293B"></span>
+                    <img id="perfil-foto" style="display:none;width:100%;height:100%;object-fit:cover" alt="Foto">
+                </div>
                 <div>
                     <strong id="perfil-nome">Usuário</strong>
                     <small id="perfil-cargo">Cargo</small>
