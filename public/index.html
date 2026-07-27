@@ -149,23 +149,65 @@
                 <img id="perfil-foto" src="https://i.pravatar.cc/60" alt="Foto">
                 <div>
                     <strong id="perfil-nome">Usuário</strong>
-                    <small id="perfil-email">email@taskflow.com</small>
+                    <small id="perfil-cargo">Cargo</small>
                 </div>
+                <i class="bi bi-chevron-down" style="color:#94A3B8;font-size:13px"></i>
             </div>
         </header>
 
         <!-- DASHBOARD -->
         <section id="pg-dashboard">
             <div class="acoes">
-                <button class="btn-acao" data-action="nova-tarefa"><i class="bi bi-plus-circle-fill"></i> Nova Tarefa</button>
-                <button class="btn-acao" data-action="concluir-primeira"><i class="bi bi-check-circle-fill"></i> Concluir</button>
-                <button class="btn-acao" data-action="excluir-ultima-concluida"><i class="bi bi-trash-fill"></i> Excluir</button>
+                <button class="btn-acao principal" data-action="nova-tarefa"><i class="bi bi-plus-circle-fill"></i> Nova Tarefa</button>
+                <button class="btn-acao outline" data-action="concluir-primeira"><i class="bi bi-check-circle"></i> Concluir</button>
+                <button class="btn-acao outline perigo" data-action="excluir-ultima-concluida"><i class="bi bi-trash"></i> Excluir</button>
             </div>
             <div class="cards">
-                <div class="card-stat"><i class="bi bi-folder-fill"></i><h3>Projetos</h3><span id="stat-projetos">0</span></div>
-                <div class="card-stat"><i class="bi bi-list-task"></i><h3>Tarefas</h3><span id="stat-tarefas">0</span></div>
-                <div class="card-stat"><i class="bi bi-check-circle-fill"></i><h3>Concluídas</h3><span id="stat-concluidas">0</span></div>
-                <div class="card-stat"><i class="bi bi-people-fill"></i><h3>Usuários</h3><span id="stat-usuarios">0</span></div>
+                <div class="card-stat">
+                    <div class="card-stat-topo">
+                        <div class="card-stat-icone azul"><i class="bi bi-folder-fill"></i></div>
+                        <span class="card-stat-titulo">Projetos</span>
+                    </div>
+                    <span class="card-stat-numero" id="stat-projetos">0</span>
+                    <div class="card-stat-baixo">
+                        <span class="card-stat-trend"><i class="bi bi-arrow-up-short"></i> em relação ao mês anterior</span>
+                    </div>
+                </div>
+                <div class="card-stat">
+                    <div class="card-stat-topo">
+                        <div class="card-stat-icone lima"><i class="bi bi-list-task"></i></div>
+                        <span class="card-stat-titulo">Tarefas</span>
+                    </div>
+                    <span class="card-stat-numero" id="stat-tarefas">0</span>
+                    <div class="card-stat-baixo">
+                        <span class="card-stat-trend"><i class="bi bi-arrow-up-short"></i> em relação à semana passada</span>
+                    </div>
+                </div>
+                <div class="card-stat">
+                    <div class="card-stat-topo">
+                        <div class="card-stat-icone verde"><i class="bi bi-check-circle-fill"></i></div>
+                        <span class="card-stat-titulo">Tarefas Concluídas</span>
+                    </div>
+                    <div class="card-stat-baixo" style="align-items:center">
+                        <div>
+                            <span class="card-stat-numero" id="stat-concluidas">0</span>
+                            <div class="card-stat-trend" id="stat-concluidas-hoje"></div>
+                        </div>
+                        <div class="card-stat-donut" id="stat-donut" style="--pct:0">
+                            <span id="stat-donut-pct">0%</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-stat">
+                    <div class="card-stat-topo">
+                        <div class="card-stat-icone roxo"><i class="bi bi-people-fill"></i></div>
+                        <span class="card-stat-titulo">Usuários</span>
+                    </div>
+                    <span class="card-stat-numero" id="stat-usuarios">0</span>
+                    <div class="card-stat-baixo">
+                        <span class="card-stat-trend" style="color:#94A3B8"><i class="bi bi-dash" style="color:#94A3B8"></i> sem alterações recentes</span>
+                    </div>
+                </div>
             </div>
             <div class="kanban" id="kanban-dashboard"></div>
         </section>

@@ -13,6 +13,7 @@ body { background:#F5F7FA; color:#1E293B; }
 .menu { display:flex; flex-direction:column; gap:6px; flex:1; }
 .menu a { text-decoration:none; color:#E2E8F0; padding:12px 14px; border-radius:10px; display:flex; align-items:center; gap:10px; transition:.2s; }
 .menu a:hover, .menu a.ativo { background:#334155; color:#A3E635; }
+.menu a.ativo { box-shadow: inset 3px 0 0 #A3E635; }
 
 /* ===== SIDEBAR FOOTER / LOGOUT ===== */
 .sidebar-footer { padding-top:20px; border-top:1px solid #334155; margin-top:20px; }
@@ -28,39 +29,66 @@ header h1 { font-size:26px; }
 .perfil small { color:#64748B; font-size:12px; }
 
 /* ===== CARDS STAT ===== */
-.cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:20px; margin-bottom:28px; }
-.card-stat { background:white; padding:22px; border-radius:14px; box-shadow:0 4px 15px rgba(0,0,0,.07); transition:.2s; }
+.cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:20px; margin-bottom:28px; }
+.card-stat { background:white; padding:20px; border-radius:16px; box-shadow:0 4px 15px rgba(0,0,0,.06); display:flex; flex-direction:column; gap:14px; transition:.2s; }
 .card-stat:hover { transform:translateY(-5px); }
-.card-stat i    { font-size:32px; color:#84CC16; }
-.card-stat h3   { margin:12px 0 6px; font-size:15px; color:#64748B; }
-.card-stat span { font-size:34px; font-weight:700; }
+.card-stat-topo { display:flex; align-items:center; gap:12px; }
+.card-stat-icone { width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+.card-stat-icone.azul  { background:#DBEAFE; color:#2563EB; }
+.card-stat-icone.lima  { background:#ECFCCB; color:#65A30D; }
+.card-stat-icone.verde { background:#DCFCE7; color:#16A34A; }
+.card-stat-icone.roxo  { background:#EDE9FE; color:#7C3AED; }
+.card-stat-titulo { font-size:14px; color:#64748B; font-weight:500; }
+.card-stat-numero { font-size:32px; font-weight:700; color:#1E293B; }
+.card-stat-baixo { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+.card-stat-trend { font-size:12px; color:#94A3B8; display:flex; align-items:center; gap:4px; }
+.card-stat-trend i { color:#22C55E; }
+.card-stat-donut { width:48px; height:48px; border-radius:50%; background:conic-gradient(#16A34A calc(var(--pct)*1%), #E2E8F0 0); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.card-stat-donut span { width:34px; height:34px; background:white; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:10.5px; font-weight:700; color:#1E293B; }
 
 /* ===== AÇÕES ===== */
-.acoes { display:flex; flex-wrap:wrap; gap:16px; margin-bottom:28px; }
-.btn-acao { background:white; border:none; padding:0 22px; height:72px; border-radius:14px; box-shadow:0 4px 12px rgba(0,0,0,.08); display:flex; align-items:center; gap:10px; font-size:15px; font-weight:600; color:#1E2A3A; cursor:pointer; transition:.2s; white-space:nowrap; }
-.btn-acao i { font-size:20px; color:#84CC16; }
-.btn-acao:hover { transform:translateY(-4px); box-shadow:0 10px 20px rgba(0,0,0,.13); }
+.acoes { display:flex; flex-wrap:wrap; gap:14px; margin-bottom:28px; }
+.btn-acao { border:none; padding:0 20px; height:48px; border-radius:10px; display:flex; align-items:center; gap:8px; font-size:14px; font-weight:600; cursor:pointer; transition:.2s; white-space:nowrap; }
+.btn-acao i { font-size:16px; }
+.btn-acao.principal { background:#A3E635; color:#1E293B; }
+.btn-acao.principal:hover { background:#84CC16; }
+.btn-acao.outline { background:white; border:1.5px solid #E2E8F0; color:#334155; }
+.btn-acao.outline:hover { background:#F8FAFC; border-color:#CBD5E1; }
+.btn-acao.outline.perigo { color:#EF4444; }
+.btn-acao.outline.perigo:hover { background:#FEF2F2; border-color:#FCA5A5; }
 
 /* ===== KANBAN ===== */
-.kanban { display:flex; gap:20px; overflow-x:auto; padding-bottom:10px; }
-.coluna { min-width:300px; padding:18px; border-radius:14px; flex-shrink:0; }
-.coluna h2 { text-align:center; margin-bottom:16px; font-size:17px; }
-.afazer    { background:#FEE2E2; }
-.andamento { background:#FEF3C7; }
-.concluido { background:#DCFCE7; }
+.kanban { display:flex; gap:20px; overflow-x:auto; padding-bottom:10px; align-items:flex-start; }
+.coluna { min-width:280px; background:white; padding:16px; border-radius:14px; flex-shrink:0; box-shadow:0 4px 15px rgba(0,0,0,.05); }
+.coluna-header { display:flex; align-items:center; gap:8px; margin-bottom:16px; }
+.coluna-dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+.coluna-titulo { font-size:14px; font-weight:600; color:#334155; flex:1; }
+.coluna-badge { font-size:12px; font-weight:700; padding:2px 9px; border-radius:99px; color:white; }
+.dot-afazer, .badge-afazer         { background:#3B82F6; }
+.dot-andamento, .badge-andamento   { background:#F59E0B; }
+.dot-concluido, .badge-concluido   { background:#22C55E; }
+.dot-atrasado, .badge-atrasado     { background:#EF4444; }
 
 /* ===== TAREFA CARD ===== */
-.tarefa { background:white; padding:14px; border-radius:12px; margin-bottom:12px; box-shadow:0 2px 8px rgba(0,0,0,.07); transition:.2s; }
-.tarefa:hover { transform:translateY(-2px); }
-.tarefa-topo { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
-.nome-tarefa { font-size:14px; font-weight:600; margin-bottom:3px; }
+.tarefa { background:#F8FAFC; padding:14px; border-radius:12px; margin-bottom:10px; border:1px solid #F1F5F9; transition:.2s; }
+.tarefa:hover { border-color:#E2E8F0; }
+.tarefa-topo { display:flex; justify-content:space-between; align-items:flex-start; gap:8px; margin-bottom:6px; }
+.nome-tarefa { font-size:13.5px; font-weight:600; color:#1E293B; }
 .resp-tarefa { font-size:13px; color:#64748B; }
 .desc-tarefa { font-size:12px; color:#94A3B8; margin-top:4px; }
 .tag-projeto { display:inline-block; font-size:11px; font-weight:600; padding:2px 8px; border-radius:99px; margin-top:6px; }
 .prazo-info  { font-size:11px; color:#94A3B8; margin-top:4px; }
-.alta  { border-left:5px solid #EF4444; }
-.media { border-left:5px solid #F59E0B; }
-.baixa { border-left:5px solid #22C55E; }
+
+.tag-prioridade { font-size:11px; font-weight:700; padding:2px 10px; border-radius:99px; white-space:nowrap; flex-shrink:0; }
+.tag-prioridade.alta  { background:#FEE2E2; color:#EF4444; }
+.tag-prioridade.media { background:#FEF3C7; color:#D97706; }
+.tag-prioridade.baixa { background:#DCFCE7; color:#16A34A; }
+
+.tarefa-rodape { display:flex; justify-content:space-between; align-items:center; margin-top:10px; }
+.tarefa-data { font-size:11.5px; color:#94A3B8; display:flex; align-items:center; gap:4px; }
+.tarefa-avatar { width:24px; height:24px; border-radius:50%; background:#1E293B; color:#A3E635; font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.add-tarefa-link { display:flex; align-items:center; gap:6px; justify-content:center; padding:10px; color:#65A30D; font-size:13px; font-weight:600; cursor:pointer; border-top:1px dashed #E2E8F0; margin-top:6px; }
+.add-tarefa-link:hover { background:#F8FAFC; border-radius:8px; }
 
 /* ===== CHECK ===== */
 .check-tarefa { width:17px; height:17px; cursor:pointer; accent-color:#84CC16; flex-shrink:0; }

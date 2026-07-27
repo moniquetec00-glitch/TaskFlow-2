@@ -46,11 +46,11 @@ async function preencherPerfil() {
     const u = auth.usuario();
     if (!u) return;
     const nome  = $("perfil-nome");
-    const email = $("perfil-email");
+    const cargo = $("perfil-cargo");
     const cfgNome  = $("cfg-nome");
     const cfgEmail = $("cfg-email");
-    if (nome)     nome.textContent  = u.nome;
-    if (email)    email.textContent = u.email;
+    if (nome)  nome.textContent  = u.nome;
+    if (cargo) cargo.textContent = u.cargo || "Membro";
     if (cfgNome)  cfgNome.value     = u.nome;
     if (cfgEmail) cfgEmail.value    = u.email;
 
@@ -92,6 +92,10 @@ async function atualizarStats() {
         $("stat-tarefas").textContent    = stats.tarefas;
         $("stat-concluidas").textContent = stats.concluidas;
         $("stat-usuarios").textContent   = stats.usuarios;
+
+        const pct = stats.tarefas ? Math.round(stats.concluidas / stats.tarefas * 100) : 0;
+        const donut = $("stat-donut");
+        if (donut) { donut.style.setProperty("--pct", pct); $("stat-donut-pct").textContent = pct + "%"; }
     } catch { /* silencioso */ }
 }
 
@@ -265,29 +269,50 @@ async function excluirUltimaConcluida() {
 // ===== RENDER KANBAN =====
 function renderKanban(containerId) {
     const c = $(containerId); if (!c) return;
+    const hoje = new Date().toISOString().split("T")[0];
+
     const colunas = [
-        { key: "afazer",    label: "A Fazer",       cls: "afazer"    },
-        { key: "andamento", label: "Em Andamento",  cls: "andamento" },
-        { key: "concluido", label: "Concluído",     cls: "concluido" }
+        { key: "afazer",    label: "A Fazer",      cls: "afazer"    },
+        { key: "andamento", label: "Em Andamento", cls: "andamento" },
+        { key: "concluido", label: "Concluído",    cls: "concluido" },
+        { key: "atrasado",  label: "Atrasado",     cls: "atrasado"  }
     ];
+
+    // separa "atrasado" (prazo vencido e não concluído) das demais
+    function tarefasDaColuna(key) {
+        if (key === "atrasado") {
+            return STATE.tarefas.filter(t => t.status !== "concluido" && t.prazo && t.prazo < hoje);
+        }
+        return STATE.tarefas.filter(t => t.status === key && !(t.prazo && t.prazo < hoje && t.status !== "concluido"));
+    }
+
     c.innerHTML = colunas.map(col => {
-        const tarefas = STATE.tarefas.filter(t => t.status === col.key);
-        const cards   = tarefas.map(t => {
-            const proj = STATE.projetos.find(p => p.id === t.projeto);
-            return `<div class="tarefa ${t.prioridade}">
+        const tarefas = tarefasDaColuna(col.key);
+        const cards = tarefas.map(t => {
+            const iniciais = (t.responsavel || t.titulo).trim().split(" ").map(p => p[0]).slice(0,2).join("").toUpperCase();
+            return `<div class="tarefa">
                 <div class="tarefa-topo">
                     <span class="nome-tarefa">${t.titulo}</span>
-                    <div style="display:flex;gap:4px">
-                        <button class="btn-ic amarelo" data-action="editar-tarefa" data-id="${t.id}"><i class="bi bi-pencil"></i></button>
-                        <button class="btn-ic vermelho" data-action="excluir-tarefa" data-id="${t.id}"><i class="bi bi-trash"></i></button>
-                    </div>
+                    <span class="tag-prioridade ${t.prioridade}">${LABEL_PRI[t.prioridade]}</span>
                 </div>
-                ${t.desc ? `<p class="desc-tarefa">${t.desc}</p>` : ""}
-                ${proj   ? `<span class="tag-projeto" style="background:${proj.cor}22;color:${proj.cor}">${proj.nome}</span>` : ""}
-                ${t.prazo ? `<p class="prazo-info"><i class="bi bi-calendar3"></i> ${formatarData(t.prazo)}</p>` : ""}
+                <div class="tarefa-rodape">
+                    ${t.prazo ? `<span class="tarefa-data"><i class="bi bi-calendar3"></i> ${formatarData(t.prazo)}</span>` : "<span></span>"}
+                    <span class="tarefa-avatar" title="Editar" data-action="editar-tarefa" data-id="${t.id}" style="cursor:pointer">${iniciais}</span>
+                </div>
             </div>`;
         }).join("");
-        return `<div class="coluna ${col.cls}"><h2>${col.label} (${tarefas.length})</h2>${cards || '<p style="color:#94A3B8;font-size:13px;text-align:center">Nenhuma tarefa</p>'}</div>`;
+
+        return `<div class="coluna">
+            <div class="coluna-header">
+                <span class="coluna-dot dot-${col.cls}"></span>
+                <span class="coluna-titulo">${col.label}</span>
+                <span class="coluna-badge badge-${col.cls}">${tarefas.length}</span>
+            </div>
+            ${cards || '<p style="color:#94A3B8;font-size:13px;text-align:center;padding:12px 0">Nenhuma tarefa</p>'}
+            <div class="add-tarefa-link" data-action="nova-tarefa-status" data-status="${col.key === 'atrasado' ? 'afazer' : col.key}">
+                <i class="bi bi-plus-lg"></i> Adicionar tarefa
+            </div>
+        </div>`;
     }).join("");
 }
 
@@ -458,6 +483,11 @@ document.addEventListener("click", e => {
                 atualizarAvatarUI(null, auth.usuario()?.nome);
                 toast("Foto removida!");
             });
+            break;
+        case "nova-tarefa-status":
+            preencherSelectProjetos();
+            abrirModal("tarefa");
+            $("t-status").value = btn.dataset.status || "afazer";
             break;
             }
         });
