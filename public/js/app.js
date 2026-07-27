@@ -96,6 +96,11 @@ async function atualizarStats() {
         const pct = stats.tarefas ? Math.round(stats.concluidas / stats.tarefas * 100) : 0;
         const donut = $("stat-donut");
         if (donut) { donut.style.setProperty("--pct", pct); $("stat-donut-pct").textContent = pct + "%"; }
+
+        const histProjetos = registrarHistorico("projetos", stats.projetos);
+        const histTarefas  = registrarHistorico("tarefas", stats.tarefas);
+        desenharSparkline("spark-projetos", histProjetos, "#2563EB");
+        desenharSparkline("spark-tarefas",  histTarefas,  "#65A30D");
     } catch { /* silencioso */ }
 }
 
@@ -234,6 +239,38 @@ async function excluirTarefa(id) {
     });
 }
 
+async function concluirTarefa(id) {
+    const t = STATE.tarefas.find(t => t.id === id);
+    if (!t) return;
+    try {
+        setLoading(true);
+        await api.atualizarTarefa(id, { ...t, status: "concluido" });
+        toast(`"${t.titulo}" concluída!`);
+        await carregarEstado();
+        atualizarStats();
+        renderKanban("kanban-dashboard");
+        renderKanban("kanban-pagina");
+        renderTarefas();
+    } catch (e) { toast(e.message, "erro"); }
+    finally     { setLoading(false); }
+}
+
+async function reabrirTarefa(id) {
+    const t = STATE.tarefas.find(t => t.id === id);
+    if (!t) return;
+    try {
+        setLoading(true);
+        await api.atualizarTarefa(id, { ...t, status: "afazer" });
+        toast(`"${t.titulo}" reaberta.`);
+        await carregarEstado();
+        atualizarStats();
+        renderKanban("kanban-dashboard");
+        renderKanban("kanban-pagina");
+        renderTarefas();
+    } catch (e) { toast(e.message, "erro"); }
+    finally     { setLoading(false); }
+}
+
 // ===== AÇÕES RÁPIDAS DO DASHBOARD =====
 async function concluirPrimeira() {
     const t = STATE.tarefas.find(t => t.status !== "concluido");
@@ -297,7 +334,14 @@ function renderKanban(containerId) {
                 </div>
                 <div class="tarefa-rodape">
                     ${t.prazo ? `<span class="tarefa-data"><i class="bi bi-calendar3"></i> ${formatarData(t.prazo)}</span>` : "<span></span>"}
-                    <span class="tarefa-avatar" title="Editar" data-action="editar-tarefa" data-id="${t.id}" style="cursor:pointer">${iniciais}</span>
+                    <div style="display:flex;align-items:center;gap:6px">
+                        ${t.status !== "concluido"
+                            ? `<button class="btn-ic verde" title="Concluir" data-action="concluir-tarefa" data-id="${t.id}"><i class="bi bi-check-lg"></i></button>`
+                            : `<button class="btn-ic amarelo" title="Reabrir" data-action="reabrir-tarefa" data-id="${t.id}"><i class="bi bi-arrow-counterclockwise"></i></button>`
+                        }
+                        <button class="btn-ic vermelho" title="Excluir" data-action="excluir-tarefa" data-id="${t.id}"><i class="bi bi-trash"></i></button>
+                        <span class="tarefa-avatar" title="Editar" data-action="editar-tarefa" data-id="${t.id}" style="cursor:pointer">${iniciais}</span>
+                    </div>
                 </div>
             </div>`;
         }).join("");
@@ -458,6 +502,8 @@ document.addEventListener("click", e => {
             break;
         case "editar-tarefa":            editarTarefa(id); break;
         case "excluir-tarefa":           excluirTarefa(id); break;
+        case "concluir-tarefa":          concluirTarefa(id); break;
+        case "reabrir-tarefa":           reabrirTarefa(id); break;
         case "excluir-projeto":          excluirProjeto(id); break;
         case "tarefa-para-projeto":      adicionarTarefaAoProjeto(id); break;
         case "concluir-primeira":        concluirPrimeira(); break;
@@ -540,6 +586,39 @@ function atualizarAvatarUI(url, nome) {
         span.textContent = nome ? nome[0].toUpperCase() : "?";
         if (remover) remover.style.display = "none";
     }
+}
+
+// ===== HISTÓRICO PARA MINI-GRÁFICOS =====
+function registrarHistorico(chave, valor) {
+    const dados = JSON.parse(localStorage.getItem("tf_historico") || "{}");
+    if (!dados[chave]) dados[chave] = [];
+    dados[chave].push(valor);
+    if (dados[chave].length > 12) dados[chave].shift(); // mantém só os últimos 12 pontos
+    localStorage.setItem("tf_historico", JSON.stringify(dados));
+    return dados[chave];
+}
+
+function desenharSparkline(svgId, pontos, cor) {
+    const svg = $(svgId);
+    if (!svg || pontos.length < 2) { if (svg) svg.innerHTML = ""; return; }
+
+    const min = Math.min(...pontos);
+    const max = Math.max(...pontos);
+    const range = max - min || 1;
+
+    const coords = pontos.map((v, i) => {
+        const x = (i / (pontos.length - 1)) * 100;
+        const y = 28 - ((v - min) / range) * 26;
+        return [x, y];
+    });
+
+    const linha = coords.map(([x, y]) => `${x},${y}`).join(" ");
+    const area  = `0,30 ${linha} 100,30`;
+
+    svg.innerHTML = `
+        <polyline class="linha" points="${linha}" style="stroke:${cor}"></polyline>
+        <polygon class="area" points="${area}" style="fill:${cor}"></polygon>
+    `;
 }
 
 document.getElementById("cfg-avatar-input") && 
