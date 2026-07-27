@@ -4,8 +4,6 @@
 
 Sistema de gerenciamento de projetos e tarefas com autenticação JWT, banco de dados MySQL e upload de avatar via Cloudinary.
 
-🌐 **Deploy:** https://flowtask.up.railway.app
-
 ---
 
 ## Funcionalidades
