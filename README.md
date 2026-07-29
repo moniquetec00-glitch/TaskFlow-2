@@ -63,8 +63,8 @@ taskflow/
 
 1. Clone o repositório:
 ```bash
-git clone https://github.com/VitorLopz/tasflow.git
-cd tasflow
+git clone https://github.com/moniquetec00-glitch/TaskFlow-2.git
+cd TaskFlow-2
 ```
 
 2. Instale as dependências:
